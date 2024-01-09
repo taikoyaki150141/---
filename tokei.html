@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="jp">
+  <title>時計</title>
+    <style>
+        body {
+          background: #ddf5ff;
+        }
+        #container {
+          margin: 0 auto;
+        }
+      </style>
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>デジタル時計</title>
+   <!--スペースキーを押す-->
+ <style>
+ /* 時計のスタイル */
+         #clock {
+             text-align: center;
+             font-size: 36px; /* フォントサイズを大きくする */
+         }
+ 
+         /* 時、分、秒のスタイル */
+         #time {
+             font-size: 28px; /* フォントサイズを大きくする */
+             display: inline-block;
+         }
+ 
+         /* 年と日付のスタイル */
+         #date {
+             font-size: 24px; /* フォントサイズを大きくする */
+         }
+ body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; } #count { font-size: 36px; }
+ </style>
+</head>
+<body>
+ <div id="clock">
+   <div id="date">
+   </div>
+   <div id="time">
+     <span id="hours">
+     </span>時
+     <span id="minutes">
+     </span>分
+     <span id="seconds">
+     </span>秒</div>
+ </div>
+ <script>
+ // アンカーを格納する変数
+         let anchor = '';
+ 
+         // デジタル時計を表示する関数
+         function displayClock() {
+             const now = new Date();
+             const hours = now.getHours().toString().padStart(2, '0');
+             const minutes = now.getMinutes().toString().padStart(2, '0');
+             const seconds = now.getSeconds().toString().padStart(2, '0');
+             const year = now.getFullYear();
+             const month = (now.getMonth() + 1).toString().padStart(2, '0');
+             const day = now.getDate().toString().padStart(2, '0');
+             
+             document.getElementById('hours').textContent = hours;
+             document.getElementById('minutes').textContent = minutes;
+             document.getElementById('seconds').textContent = seconds;
+             document.getElementById('date').textContent = `${year}年${month}月${day}日`;
+         }
+ 
+         // 初回表示
+         displayClock();
+ 
+         // 毎秒時計を更新
+         setInterval(displayClock, 1000);
+ 
+         // スペースキーが押されたときのイベントハンドラ
+          document.addEventListener('keydown', function(event) {
+             if (event.key === ' ') { // スペースキーが押された場合
+                 event.preventDefault(); // デフォルトのスクロールを無効化
+ 
+                 // ランダムな英数字の生成
+                 const randomAnchor = Math.random().toString(36).substr(2, 6);
+ 
+                 // アンカーを新しいランダムな値に置き換える
+                 anchor = randomAnchor;
+ 
+                 // 現在のURLにアンカーを追加
+                 const currentURL = window.location.href;
+                 const newURL = currentURL.replace(/#.*/, '') + '#' + anchor;
+ 
+                 // ページの遷移
+                 window.location.href = newURL;
+             }
+         });
+ </script>
+ <div id="count">0</div> <script> let count = 0; document.addEventListener("keydown", function(event) { if (event.key === " ") { count++; } }); setInterval(function() { document.getElementById("count").textContent = count; }, 100); </script>
+</body>
+<h1></h1>
+<a href="index.html"><button type="button" class="btn">ホーム</button></a>
+<style>
+    .btn {
+          padding: 10px 20px;
+          background: yellow;
+          color: #111111;
+          border-bottom: solid 5px gray;
+          border-radius: 4px;
+          }
+.btn:active {
+          -webkit-transform: translateY(5px);
+          transform: translateY(5px);
+          border-bottom: none;
+          }
+</style>
+
+
+
+
+</html>
