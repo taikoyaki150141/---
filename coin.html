@@ -1,4 +1,4 @@
-<title>コイントスやで〜〜〜〜</title>
+
 <style>
 
     @keyframes flip {
@@ -132,6 +132,13 @@ body {
     <span id="count">3</span>
 </div>
 <script>
+  let a=null
+  let f="コイントス"
+  let g="回"
+window.onload = function(){
+  flipCoins(document.getElementById('coin-count').value)
+  
+}
 var coinCount = document.getElementById('coin-count');
 var count = document.getElementById('count');
 
@@ -140,6 +147,9 @@ coinCount.addEventListener('input', function() {
 });
 
 function flipCoins(numCoins) {
+  
+  a++
+  document.title = f+a+g;
     var resultContainer = document.getElementById('result');
     resultContainer.innerHTML = '';
 
@@ -149,9 +159,9 @@ function flipCoins(numCoins) {
         coin.classList.add('coin');
 
         if (result === 1) {
-            coin.src = '表.png'
+            coin.src = 'https://taikoyaki150141.github.io/---/表.png'
         } else {
-            coin.src = '裏.png';
+            coin.src = 'https://taikoyaki150141.github.io/---/裏.png';
         }
 
         resultContainer.appendChild(coin);
@@ -168,3 +178,11 @@ function flipCoins(numCoins) {
  body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; } #count { font-size: 36px; }
 
     </style>
+    
+    
+    <script type="text/javascript">
+    function titleChange() {
+      
+    }
+    </script>
+    </head>
