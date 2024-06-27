@@ -47,21 +47,14 @@
       border-radius: 4px;
       margin-right: 10px;
     }
-    .button, #send-button, #create-group-button, #join-group-button, #save-name-button, #auth-button {
+    #send-button {
       padding: 10px 20px;
       font-size: 16px;
       border: none;
       border-radius: 4px;
-      background: linear-gradient(45deg, #007bff, #0056b3);
+      background-color: #28a745;
       color: white;
       cursor: pointer;
-      margin-bottom: 10px;
-      transition: background 0.3s, box-shadow 0.3s;
-      display: block;
-    }
-    .button:hover, #send-button:hover, #create-group-button:hover, #join-group-button:hover, #save-name-button:hover, #auth-button:hover {
-      background: linear-gradient(45deg, #0056b3, #004080);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     #name-container {
       position: fixed;
@@ -90,10 +83,18 @@
       width: calc(100% - 22px);
       margin-bottom: 10px;
     }
+    #save-name-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
     #group-container {
       padding: 10px;
       border-top: 1px solid #ddd;
-      text-align: left;
     }
     #group-form {
       display: flex;
@@ -106,21 +107,33 @@
       border-radius: 4px;
       margin-bottom: 10px;
     }
-    .group-button {
+    #create-group-button, #join-group-button {
       padding: 10px 20px;
       font-size: 16px;
       border: none;
       border-radius: 4px;
-      background: linear-gradient(45deg, #ff8c00, #ff4500);
+      background-color: #007bff;
       color: white;
       cursor: pointer;
       margin-bottom: 10px;
-      transition: background 0.3s, box-shadow 0.3s;
-      display: block;
     }
-    .group-button:hover {
-      background: linear-gradient(45deg, #ff4500, #ff2400);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    #current-group {
+      margin-top: 20px;
+    }
+    #group-history {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    #group-history button {
+      margin-bottom: 5px;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
     }
     #auth-container {
       position: fixed;
@@ -149,6 +162,15 @@
       width: calc(100% - 22px);
       margin-bottom: 10px;
     }
+    #auth-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -168,7 +190,6 @@
     </div>
     <div id="group-history">
       <p>参加済みのグループ:</p>
-      <!-- 参加済みのグループのボタンがここに追加されます -->
     </div>
   </div>
   <div id="chat-section">
@@ -193,50 +214,132 @@
   </div>
   <script>
     const firebaseConfig = {
-      // Your Firebase configuration
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
     };
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
     document.addEventListener("DOMContentLoaded", function() {
+      const chatContainer = document.getElementById("chat-container");
+      const messageForm = document.getElementById("message-form");
+      const messageInput = document.getElementById("message-input");
       const nameContainer = document.getElementById("name-container");
-      const saveNameButton = document.getElementById("save-name-button");
+      const nameForm = document.getElementById("name-form");
       const nameInput = document.getElementById("name-input");
-      const authContainer = document.getElementById("auth-container");
-      const authForm = document.getElementById("auth-form");
-      const authGroupIdInput = document.getElementById("auth-group-id-input");
-      const authGroupPasswordInput = document.getElementById("auth-group-password-input");
+      const saveNameButton = document.getElementById("save-name-button");
+
       const groupForm = document.getElementById("group-form");
       const groupNameInput = document.getElementById("group-name-input");
       const groupPasswordInput = document.getElementById("group-password-input");
       const joinGroupButton = document.getElementById("join-group-button");
-      const chatContainer = document.getElementById("chat-container");
-      const messageForm = document.getElementById("message-form");
-      const messageInput = document.getElementById("message-input");
+      const authContainer = document.getElementById("auth-container");
+      const authForm = document.getElementById("auth-form");
+      const authGroupIdInput = document.getElementById("auth-group-id-input");
+      const authGroupPasswordInput = document.getElementById("auth-group-password-input");
+
       const currentGroupName = document.getElementById("current-group-name");
-      let currentUserName = "";
-      let currentGroupId = "";
-      let currentGroupRef = null;
+      const groupHistory = document.getElementById("group-history");
+
+      function setCookie(name, value, days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+      }
+
+      function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(";");
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == " ") c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+      }
+
+      function addGroupToHistory(groupId, groupName) {
+        let groupHistoryList = JSON.parse(getCookie("groupHistory") || "[]");
+        groupHistoryList.push({ id: groupId, name: groupName });
+        setCookie("groupHistory", JSON.stringify(groupHistoryList), 365);
+        renderGroupHistory();
+      }
+
+      function renderGroupHistory() {
+        groupHistory.innerHTML = "<p>参加済みのグループ:</p>";
+        const groupHistoryList = JSON.parse(getCookie("groupHistory") || "[]");
+        groupHistoryList.forEach(group => {
+          const groupButton = document.createElement("button");
+          groupButton.textContent = group.name;
+          groupButton.addEventListener("click", function() {
+            switchGroup(group.id, group.name);
+          });
+          groupHistory.appendChild(groupButton);
+        });
+      }
+
+      function switchGroup(groupId, groupName) {
+        setCookie("groupId", groupId, 365);
+        currentGroupName.textContent = groupName;
+        renderMessages(groupId);
+      }
+
+      let userName = getCookie("userName");
+      let groupId = getCookie("groupId");
+
+      if (!userName) {
+        nameContainer.style.display = "flex";
+      } else {
+        if (groupId) {
+          renderMessages(groupId);
+        }
+        renderGroupHistory();
+      }
 
       saveNameButton.addEventListener("click", function() {
-        currentUserName = nameInput.value;
-        if (currentUserName !== "") {
+        userName = nameInput.value.trim();
+        if (userName) {
+          setCookie("userName", userName, 365);
           nameContainer.style.display = "none";
+        }
+      });
+
+      messageForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const message = messageInput.value.trim();
+        if (message && groupId) {
+          const newMessageRef = database.ref("messages/" + groupId).push();
+          newMessageRef.set({
+            name: userName,
+            message: message
+          });
+          messageInput.value = "";
         }
       });
 
       groupForm.addEventListener("submit", function(event) {
         event.preventDefault();
-        const groupName = groupNameInput.value;
-        const groupPassword = groupPasswordInput.value;
+        const groupName = groupNameInput.value.trim();
+        const groupPassword = groupPasswordInput.value.trim();
         if (groupName && groupPassword) {
-          const newGroupRef = database.ref("groups").push();
-          newGroupRef.set({
+          groupId = generateRandomId();
+          database.ref("groups/" + groupId).set({
             name: groupName,
             password: groupPassword
           });
-          joinGroup(newGroupRef.key);
+          setCookie("groupId", groupId, 365);
+          currentGroupName.textContent = groupName;
+          renderMessages(groupId);
+          addGroupToHistory(groupId, groupName);
+          alert(`グループID: ${groupId}`);
         }
       });
 
@@ -246,65 +349,37 @@
 
       authForm.addEventListener("submit", function(event) {
         event.preventDefault();
-        const groupId = authGroupIdInput.value;
-        const groupPassword = authGroupPasswordInput.value;
-        database.ref("groups/" + groupId).once("value", function(snapshot) {
-          const groupData = snapshot.val();
-          if (groupData && groupData.password === groupPassword) {
-            authContainer.style.display = "none";
-            joinGroup(groupId);
-          } else {
-            alert("グループIDまたはパスワードが間違っています。");
-          }
-        });
+        const inputGroupId = authGroupIdInput.value.trim();
+        const inputGroupPassword = authGroupPasswordInput.value.trim();
+        if (inputGroupId && inputGroupPassword) {
+          database.ref("groups/" + inputGroupId).get().then(function(snapshot) {
+            if (snapshot.exists() && snapshot.val().password === inputGroupPassword) {
+              groupId = inputGroupId;
+              setCookie("groupId", groupId, 365);
+              currentGroupName.textContent = snapshot.val().name;
+              renderMessages(groupId);
+              addGroupToHistory(groupId, snapshot.val().name);
+              authContainer.style.display = "none";
+            } else {
+              alert("グループIDまたはパスワードが正しくありません");
+            }
+          });
+        }
       });
 
-      function joinGroup(groupId) {
-        currentGroupId = groupId;
-        currentGroupRef = database.ref("groups/" + groupId + "/messages");
-        currentGroupRef.on("child_added", function(snapshot) {
+      function renderMessages(groupId) {
+        chatContainer.innerHTML = "";
+        database.ref("messages/" + groupId).on("child_added", function(snapshot) {
           const messageData = snapshot.val();
-          displayMessage(messageData.name, messageData.message);
-        });
-        database.ref("groups/" + groupId).once("value", function(snapshot) {
-          const groupData = snapshot.val();
-          currentGroupName.textContent = groupData.name;
+          const messageElement = document.createElement("div");
+          messageElement.textContent = messageData.name + ": " + messageData.message;
+          chatContainer.appendChild(messageElement);
+          chatContainer.scrollTop = chatContainer.scrollHeight;
         });
       }
 
-      messageForm.addEventListener("submit", function(event) {
-        event.preventDefault();
-        const message = messageInput.value;
-        if (message !== "" && currentGroupId !== "") {
-          if (message === "/c") {
-            clearChatHistory();
-          } else {
-            currentGroupRef.push().set({
-              name: currentUserName,
-              message: message
-            });
-          }
-          messageInput.value = "";
-        }
-      });
-
-      function displayMessage(name, message) {
-        const messageElement = document.createElement("p");
-        messageElement.textContent = name + ": " + message;
-        chatContainer.appendChild(messageElement);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
-
-      function clearChatHistory() {
-        if (currentGroupId !== "") {
-          currentGroupRef.remove()
-            .then(() => {
-              chatContainer.innerHTML = "";
-            })
-            .catch((error) => {
-              console.error("Error removing chat history: ", error);
-            });
-        }
+      function generateRandomId() {
+        return Math.random().toString(36).substr(2, 8);
       }
     });
   </script>
