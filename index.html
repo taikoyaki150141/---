@@ -6,149 +6,149 @@
   <title>Firebaseチャット</title>
   <style>
     body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    height: 100vh;
-    flex-direction: row;
-  }
-  #sidebar {
-    width: 250px;
-    background-color: #f4f4f4;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  #chat-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  #chat-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    border-bottom: 1px solid #ddd;
-  }
-  #message-form {
-    display: flex;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-  }
-  #message-input {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-right: 10px;
-  }
-  .button, #send-button, #create-group-button, #join-group-button, #save-name-button, #auth-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    background: linear-gradient(45deg, #007bff, #0056b3);
-    color: white;
-    cursor: pointer;
-    margin-bottom: 10px;
-    transition: background 0.3s, box-shadow 0.3s;
-    display: block;
-  }
-  .button:hover, #send-button:hover, #create-group-button:hover, #join-group-button:hover, #save-name-button:hover, #auth-button:hover {
-    background: linear-gradient(45deg, #0056b3, #004080);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  #name-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  #name-form {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  #name-input {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: calc(100% - 22px);
-    margin-bottom: 10px;
-  }
-  #group-container {
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    text-align: left;
-  }
-  #group-form {
-    display: flex;
-    flex-direction: column;
-  }
-  #group-name-input, #group-password-input {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-  }
-  .group-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    background: linear-gradient(45deg, #ff8c00, #ff4500);
-    color: white;
-    cursor: pointer;
-    margin-bottom: 10px;
-    transition: background 0.3s, box-shadow 0.3s;
-    display: block;
-  }
-  .group-button:hover {
-    background: linear-gradient(45deg, #ff4500, #ff2400);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  #auth-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  #auth-form {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  #auth-group-id-input, #auth-group-password-input {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: calc(100% - 22px);
-    margin-bottom: 10px;
-  }
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      flex-direction: row;
+    }
+    #sidebar {
+      width: 250px;
+      background-color: #f4f4f4;
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #chat-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    #message-form {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    #message-input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    .button, #send-button, #create-group-button, #join-group-button, #save-name-button, #auth-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background: linear-gradient(45deg, #007bff, #0056b3);
+      color: white;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background 0.3s, box-shadow 0.3s;
+      display: block;
+    }
+    .button:hover, #send-button:hover, #create-group-button:hover, #join-group-button:hover, #save-name-button:hover, #auth-button:hover {
+      background: linear-gradient(45deg, #0056b3, #004080);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    #name-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    #name-form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    #name-input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: calc(100% - 22px);
+      margin-bottom: 10px;
+    }
+    #group-container {
+      padding: 10px;
+      border-top: 1px solid #ddd;
+      text-align: left;
+    }
+    #group-form {
+      display: flex;
+      flex-direction: column;
+    }
+    #group-name-input, #group-password-input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .group-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background: linear-gradient(45deg, #ff8c00, #ff4500);
+      color: white;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background 0.3s, box-shadow 0.3s;
+      display: block;
+    }
+    .group-button:hover {
+      background: linear-gradient(45deg, #ff4500, #ff2400);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    #auth-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    #auth-form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    #auth-group-id-input, #auth-group-password-input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: calc(100% - 22px);
+      margin-bottom: 10px;
+    }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -193,21 +193,13 @@
   </div>
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyAxFGXTPIp9HU7P3Jv9latfa_fZEb1anQ0",
-      authDomain: "jjjjjjjjjjjjjjjj-d7ea6.firebaseapp.com",
-      databaseURL: "https://jjjjjjjjjjjjjjjj-d7ea6-default-rtdb.firebaseio.com",
-      projectId: "jjjjjjjjjjjjjjjj-d7ea6",
-      storageBucket: "jjjjjjjjjjjjjjjj-d7ea6.appspot.com",
-      messagingSenderId: "47669496508",
-      appId: "1:47669496508:web:f2bb829d8811bd5f2f5eb9",
-      measurementId: "G-MSNB77FVP5"
+      // Your Firebase configuration
     };
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
     document.addEventListener("DOMContentLoaded", function() {
-      // DOM要素の取得
       const nameContainer = document.getElementById("name-container");
       const saveNameButton = document.getElementById("save-name-button");
       const nameInput = document.getElementById("name-input");
@@ -223,201 +215,96 @@
       const messageForm = document.getElementById("message-form");
       const messageInput = document.getElementById("message-input");
       const currentGroupName = document.getElementById("current-group-name");
-      const groupHistory = document.getElementById("group-history");
+      let currentUserName = "";
+      let currentGroupId = "";
+      let currentGroupRef = null;
 
-      // ユーザー名を保存するための変数
-      let username = "";
-
-      // クッキーを設定する関数
-      function setCookie(name, value, days) {
-        const d = new Date();
-        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-        const expires = "expires=" + d.toUTCString();
-        document.cookie = name + "=" + value + ";" + expires + ";path=/";
-      }
-
-      // クッキーを取得する関数
-      function getCookie(name) {
-        const cname = name + "=";
-        const decodedCookie = decodeURIComponent(document.cookie);
-        const ca = decodedCookie.split(';');
-        for(let i = 0; i < ca.length; i++) {
-          let c = ca[i];
-          while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-          }
-          if (c.indexOf(cname) == 0) {
-            return c.substring(cname.length, c.length);
-          }
-        }
-        return "";
-      }
-
-      // ページがロードされたときにクッキーから名前を取得
-      username = getCookie("username");
-      if (username) {
-        nameContainer.style.display = "none";
-      } else {
-        nameContainer.style.display = "flex";
-      }
-
-      // ページがロードされたときにクッキーから参加済みグループを取得
-      const savedGroups = getCookie("joinedGroups");
-      if (savedGroups) {
-        joinedGroups = savedGroups.split(",");
-        joinedGroups.forEach(groupId => {
-          // グループ情報をFirebaseから取得してボタンを追加
-          database.ref(`groups/${groupId}`).once("value", (snapshot) => {
-            const groupData = snapshot.val();
-            if (groupData) {
-              addGroupButton(groupId, groupData.name);
-            }
-          });
-        });
-      }
-
-      // ユーザーが名前を入力して保存ボタンをクリックしたときの処理
-      saveNameButton.addEventListener("click", () => {
-        username = nameInput.value.trim();
-        if (username) {
+      saveNameButton.addEventListener("click", function() {
+        currentUserName = nameInput.value;
+        if (currentUserName !== "") {
           nameContainer.style.display = "none";
-          setCookie("username", username, 30);
         }
       });
 
-      // メッセージ送信フォームの送信処理
-      messageForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const message = messageInput.value.trim();
-        if (message) {
-          sendMessageToDatabase(message);
+      groupForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const groupName = groupNameInput.value;
+        const groupPassword = groupPasswordInput.value;
+        if (groupName && groupPassword) {
+          const newGroupRef = database.ref("groups").push();
+          newGroupRef.set({
+            name: groupName,
+            password: groupPassword
+          });
+          joinGroup(newGroupRef.key);
+        }
+      });
+
+      joinGroupButton.addEventListener("click", function() {
+        authContainer.style.display = "flex";
+      });
+
+      authForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const groupId = authGroupIdInput.value;
+        const groupPassword = authGroupPasswordInput.value;
+        database.ref("groups/" + groupId).once("value", function(snapshot) {
+          const groupData = snapshot.val();
+          if (groupData && groupData.password === groupPassword) {
+            authContainer.style.display = "none";
+            joinGroup(groupId);
+          } else {
+            alert("グループIDまたはパスワードが間違っています。");
+          }
+        });
+      });
+
+      function joinGroup(groupId) {
+        currentGroupId = groupId;
+        currentGroupRef = database.ref("groups/" + groupId + "/messages");
+        currentGroupRef.on("child_added", function(snapshot) {
+          const messageData = snapshot.val();
+          displayMessage(messageData.name, messageData.message);
+        });
+        database.ref("groups/" + groupId).once("value", function(snapshot) {
+          const groupData = snapshot.val();
+          currentGroupName.textContent = groupData.name;
+        });
+      }
+
+      messageForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const message = messageInput.value;
+        if (message !== "" && currentGroupId !== "") {
+          if (message === "/c") {
+            clearChatHistory();
+          } else {
+            currentGroupRef.push().set({
+              name: currentUserName,
+              message: message
+            });
+          }
           messageInput.value = "";
         }
       });
 
-      // メッセージをFirebaseデータベースに送信する関数
-      function sendMessageToDatabase(message) {
-        const messagesRef = database.ref("messages");
-        const newMessageRef = messagesRef.push();
-        newMessageRef.set({
-          username: username,
-          message: message,
-          timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
-      }
-
-      // Firebaseデータベースのメッセージの変更を監視
-      database.ref("messages").on("child_added", (snapshot) => {
-        const messageData = snapshot.val();
-        displayMessage(messageData.username, messageData.message);
-      });
-
-      // メッセージを画面に表示する関数
-      function displayMessage(username, message) {
-        const messageElement = document.createElement("div");
-        messageElement.textContent = `${username}: ${message}`;
+      function displayMessage(name, message) {
+        const messageElement = document.createElement("p");
+        messageElement.textContent = name + ": " + message;
         chatContainer.appendChild(messageElement);
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
 
-      // グループ作成ボタンのクリック処理
-      document.getElementById("create-group-button").addEventListener("click", (e) => {
-        e.preventDefault();
-        const groupName = groupNameInput.value.trim();
-        const groupPassword = groupPasswordInput.value.trim();
-        if (groupName && groupPassword) {
-          createGroup(groupName, groupPassword);
+      function clearChatHistory() {
+        if (currentGroupId !== "") {
+          currentGroupRef.remove()
+            .then(() => {
+              chatContainer.innerHTML = "";
+            })
+            .catch((error) => {
+              console.error("Error removing chat history: ", error);
+            });
         }
-      });
-
-      // グループ参加ボタンのクリック処理
-      joinGroupButton.addEventListener("click", () => {
-        authContainer.style.display = "flex";
-      });
-
-      // グループ認証ボタンのクリック処理
-      authForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const groupId = authGroupIdInput.value.trim();
-        const groupPassword = authGroupPasswordInput.value.trim();
-        if (groupId && groupPassword) {
-          authenticateGroup(groupId, groupPassword);
-        }
-      });
-
-      // ランダムな短いグループIDを生成する関数
-      function generateShortGroupId() {
-        return Math.random().toString(36).substr(2, 6); // 6文字のランダムなIDを生成
-      }
-
-      // ユーザーが参加しているグループIDを保存するリスト
-      let joinedGroups = [];
-
-      // グループを作成する関数
-      function createGroup(groupName, groupPassword) {
-        const groupsRef = database.ref("groups");
-        const newGroupId = generateShortGroupId();
-        const newGroupRef = groupsRef.child(newGroupId);
-        newGroupRef.set({
-          name: groupName,
-          password: groupPassword
-        }).then(() => {
-          alert(`グループが作成されました。グループID: ${newGroupId}`);
-          joinGroup(newGroupId);
-          addGroupButton(newGroupId, groupName); // グループ作成時にボタンを追加
-        });
-      }
-
-      // グループに参加する関数
-      function joinGroup(groupId) {
-        if (joinedGroups.includes(groupId)) {
-          alert("既にこのグループに参加しています");
-          return;
-        }
-        database.ref(`groups/${groupId}`).once("value", (snapshot) => {
-          const groupData = snapshot.val();
-          if (groupData) {
-            currentGroupName.textContent = groupData.name;
-            authContainer.style.display = "none";
-            loadGroupMessages(groupId);
-            joinedGroups.push(groupId); // 参加したグループをリストに追加
-            setCookie("joinedGroups", joinedGroups.join(","), 30); // クッキーに保存
-          }
-        });
-      }
-
-      // グループのメッセージを読み込む関数
-      function loadGroupMessages(groupId) {
-        database.ref(`groups/${groupId}/messages`).on("child_added", (snapshot) => {
-          const messageData = snapshot.val();
-          displayMessage(messageData.username, messageData.message);
-        });
-      }
-
-      // グループを認証する関数
-      function authenticateGroup(groupId, groupPassword) {
-        database.ref(`groups/${groupId}`).once("value", (snapshot) => {
-          const groupData = snapshot.val();
-          if (groupData) {
-            if (groupData.password === groupPassword) {
-              joinGroup(groupId);
-            } else {
-              alert("グループパスワードが間違っています");
-            }
-          } else {
-            alert("グループが見つかりません");
-          }
-        });
-      }
-
-      // グループボタンを追加する関数
-      function addGroupButton(groupId, groupName) {
-        const groupButton = document.createElement("button");
-        groupButton.textContent = groupName;
-        groupButton.addEventListener("click", () => {
-          joinGroup(groupId);
-        });
-        groupHistory.appendChild(groupButton);
       }
     });
   </script>
