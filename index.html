@@ -238,207 +238,244 @@
     const database = firebase.database();
 
     document.addEventListener("DOMContentLoaded", function() {
-      const chatContainer = document.getElementById("chat-container");
-      const messageForm = document.getElementById("message-form");
-      const messageInput = document.getElementById("message-input");
-      const nameContainer = document.getElementById("name-container");
-      const nameForm = document.getElementById("name-form");
-      const nameInput = document.getElementById("name-input");
-      const saveNameButton = document.getElementById("save-name-button");
+  const chatContainer = document.getElementById("chat-container");
+  const messageForm = document.getElementById("message-form");
+  const messageInput = document.getElementById("message-input");
+  const nameContainer = document.getElementById("name-container");
+  const nameForm = document.getElementById("name-form");
+  const nameInput = document.getElementById("name-input");
+  const saveNameButton = document.getElementById("save-name-button");
 
-      const groupForm = document.getElementById("group-form");
-      const groupNameInput = document.getElementById("group-name-input");
-      const groupPasswordInput = document.getElementById("group-password-input");
-      const joinGroupButton = document.getElementById("join-group-button");
-      const currentGroupNameElement = document.getElementById("current-group-name");
-      const groupHistoryContainer = document.getElementById("group-history");
-      const globalChatButton = document.getElementById("global-chat-button");
+  const groupForm = document.getElementById("group-form");
+  const groupNameInput = document.getElementById("group-name-input");
+  const groupPasswordInput = document.getElementById("group-password-input");
+  const joinGroupButton = document.getElementById("join-group-button");
+  const currentGroupNameElement = document.getElementById("current-group-name");
+  const groupHistoryContainer = document.getElementById("group-history");
+  const globalChatButton = document.getElementById("global-chat-button");
 
-      const authContainer = document.getElementById("auth-container");
-      const authForm = document.getElementById("auth-form");
-      const authGroupIdInput = document.getElementById("auth-group-id-input");
-      const authGroupPasswordInput = document.getElementById("auth-group-password-input");
-      const authButton = document.getElementById("auth-button");
+  const authContainer = document.getElementById("auth-container");
+  const authForm = document.getElementById("auth-form");
+  const authGroupIdInput = document.getElementById("auth-group-id-input");
+  const authGroupPasswordInput = document.getElementById("auth-group-password-input");
+  const authButton = document.getElementById("auth-button");
 
-      let currentGroupId = "global";
-      let currentUserName = "";
+  let currentGroupId = "global";
+  let currentUserName = "";
 
-      // 名前をクッキーに保存する
-      function saveNameToCookies(name) {
-        document.cookie = `username=${name}; path=/; max-age=${60 * 60 * 24 * 30}`;
+  // 名前をクッキーに保存する
+  function saveNameToCookies(name) {
+    document.cookie = `username=${name}; path=/; max-age=${60 * 60 * 24 * 30}`;
+  }
+
+  // クッキーから名前を取得する
+  function getNameFromCookies() {
+    const matches = document.cookie.match(new RegExp(
+      "(?:^|; )username=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+  }
+
+  // 初期化
+  function initialize() {
+    const storedName = getNameFromCookies();
+    if (storedName) {
+      currentUserName = storedName;
+      nameContainer.style.display = "none";
+    } else {
+      nameContainer.style.display = "flex";
+    }
+    loadGroupHistory();
+    loadMessages(currentGroupId);
+  }
+
+  // グループの履歴を読み込む
+  function loadGroupHistory() {
+    const groupHistory = JSON.parse(localStorage.getItem("groupHistory")) || [];
+    groupHistoryContainer.innerHTML = "<p>参加済みのグループ:</p>";
+    groupHistory.forEach(group => {
+      const button = document.createElement("button");
+      button.textContent = group.name;
+      button.addEventListener("click", () => {
+        switchGroup(group.id, group.name);
+      });
+      groupHistoryContainer.appendChild(button);
+    });
+  }
+
+  // グループに参加する
+  function joinGroup(groupId, groupName) {
+    const groupHistory = JSON.parse(localStorage.getItem("groupHistory")) || [];
+    if (groupHistory.some(group => group.id === groupId)) {
+      alert("このグループには既に参加済みです。");
+      return;
+    }
+    database.ref(`groups/${groupId}/members/${currentUserName}`).set(true, (error) => {
+      if (error) {
+        alert("グループに参加できませんでした。");
+      } else {
+        switchGroup(groupId, groupName);
+        addToGroupHistory(groupId, groupName);
       }
+    });
+  }
 
-      // クッキーから名前を取得する
-      function getNameFromCookies() {
-        const matches = document.cookie.match(new RegExp(
-          "(?:^|; )username=([^;]*)"
-        ));
-        return matches ? decodeURIComponent(matches[1]) : undefined;
-      }
+  // グループ履歴に追加する
+  function addToGroupHistory(groupId, groupName) {
+    let groupHistory = JSON.parse(localStorage.getItem("groupHistory")) || [];
+    if (!groupHistory.some(group => group.id === groupId)) {
+      groupHistory.push({ id: groupId, name: groupName });
+      localStorage.setItem("groupHistory", JSON.stringify(groupHistory));
+      loadGroupHistory();
+    }
+  }
 
-      // 初期化
-      function initialize() {
-        const storedName = getNameFromCookies();
-        if (storedName) {
-          currentUserName = storedName;
-          nameContainer.style.display = "none";
+  // グループを切り替える
+  function switchGroup(groupId, groupName) {
+    currentGroupId = groupId;
+    currentGroupNameElement.textContent = groupName;
+    loadMessages(groupId);
+  }
+
+  // メッセージを読み込む
+  function loadMessages(groupId) {
+    chatContainer.innerHTML = "";
+    database.ref(`messages/${groupId}`).on("child_added", (snapshot) => {
+      const message = snapshot.val();
+      displayMessage(message);
+    });
+  }
+
+  // メッセージを表示する
+  function displayMessage(message) {
+    const messageElement = document.createElement("div");
+    messageElement.textContent = `${message.name}: ${message.text}`;
+    chatContainer.appendChild(messageElement);
+  }
+
+  // メッセージを送信する
+   messageForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const text = messageInput.value;
+      if (text) {
+        //"/ca"を入力したときの処理
+        if (text === "/help") {
+          alert("/help:今見てるやつを表示\n/c:チャット履歴の削除");
         } else {
-          nameContainer.style.display = "flex";
-        }
-        loadGroupHistory();
-        loadMessages(currentGroupId);
-      }
-
-      // グループの履歴を読み込む
-      function loadGroupHistory() {
-        const groupHistory = JSON.parse(localStorage.getItem("groupHistory")) || [];
-        groupHistoryContainer.innerHTML = "<p>参加済みのグループ:</p>";
-        groupHistory.forEach(group => {
-          const button = document.createElement("button");
-          button.textContent = group.name;
-          button.addEventListener("click", () => {
-            switchGroup(group.id, group.name);
-          });
-          groupHistoryContainer.appendChild(button);
-        });
-      }
-
-      // グループに参加する
-      function joinGroup(groupId, groupName) {
-        const groupHistory = JSON.parse(localStorage.getItem("groupHistory")) || [];
-        if (groupHistory.some(group => group.id === groupId)) {
-          alert("このグループには既に参加済みです。");
-          return;
-        }
-        database.ref(`groups/${groupId}/members/${currentUserName}`).set(true, (error) => {
-          if (error) {
-            alert("グループに参加できませんでした。");
-          } else {
-            switchGroup(groupId, groupName);
-            addToGroupHistory(groupId, groupName);
-          }
-        });
-      }
-
-      // グループ履歴に追加する
-      function addToGroupHistory(groupId, groupName) {
-        let groupHistory = JSON.parse(localStorage.getItem("groupHistory")) || [];
-        if (!groupHistory.some(group => group.id === groupId)) {
-          groupHistory.push({ id: groupId, name: groupName });
-          localStorage.setItem("groupHistory", JSON.stringify(groupHistory));
-          loadGroupHistory();
-        }
-      }
-
-      // グループを切り替える
-      function switchGroup(groupId, groupName) {
-        currentGroupId = groupId;
-        currentGroupNameElement.textContent = groupName;
-        loadMessages(groupId);
-      }
-
-      // メッセージを読み込む
-      function loadMessages(groupId) {
-        chatContainer.innerHTML = "";
-        database.ref(`messages/${groupId}`).on("child_added", (snapshot) => {
-          const message = snapshot.val();
-          displayMessage(message);
-        });
-      }
-
-      // メッセージを表示する
-      function displayMessage(message) {
-        const messageElement = document.createElement("div");
-        messageElement.textContent = `${message.name}: ${message.text}`;
-        chatContainer.appendChild(messageElement);
-      }
-
-      // メッセージを送信する
-      messageForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const text = messageInput.value;
-        if (text) {
           const message = {
             name: currentUserName,
             text: text,
             timestamp: Date.now()
           };
           database.ref(`messages/${currentGroupId}`).push(message);
-          messageInput.value = "";
         }
-      });
-
-      // 名前を保存する
-      saveNameButton.addEventListener("click", () => {
-        const name = nameInput.value;
-        if (name) {
-          currentUserName = name;
-          saveNameToCookies(name);
-          nameContainer.style.display = "none";
-        }
-      });
-
-      // グループを作成する
-      groupForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const groupName = groupNameInput.value;
-        const groupPassword = groupPasswordInput.value;
-        if (groupName && groupPassword) {
-          const groupId = Date.now().toString();
-          const groupData = {
-            name: groupName,
-            password: groupPassword
+        messageInput.value = "";
+        if (text === "/c") {
+        clearChat();
+      } else {
+        
+        database.ref(`messages/${currentGroupId}`).push(message);
+      }
+      //"/c"を入力したときの処理
+      if (text === "/c") {
+          // チャット履歴を削除する処理
+          database.ref(`messages/${currentGroupId}`).remove();
+          chatContainer.innerHTML = "";
+        } else {
+          const message = {
+            name: currentUserName,
+            text: text,
+            timestamp: Date.now()
           };
-          database.ref(`groups/${groupId}`).set(groupData, (error) => {
-            if (error) {
-              alert("グループを作成できませんでした。");
-            } else {
-              alert(`グループを作成しました。グループID: ${groupId}`);
-              joinGroup(groupId, groupName);
-            }
-          });
+          database.ref(`messages/${currentGroupId}`).push(message);
         }
-      });
-
-      // グループに参加する
-      joinGroupButton.addEventListener("click", () => {
-        authContainer.style.display = "flex";
-      });
-
-      // グループ認証
-      authForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const groupId = authGroupIdInput.value;
-        const groupPassword = authGroupPasswordInput.value;
-        if (groupId && groupPassword) {
-          database.ref(`groups/${groupId}`).get().then((snapshot) => {
-            if (snapshot.exists() && snapshot.val().password === groupPassword) {
-              joinGroup(groupId, snapshot.val().name);
-              authContainer.style.display = "none";
-            } else {
-              alert("グループIDまたはパスワードが間違っています。");
-            }
-          }).catch((error) => {
-            alert("グループを取得できませんでした。");
-          });
-        }
-      });
-
-      // グローバルチャットに切り替える
-      globalChatButton.addEventListener("click", () => {
-        switchGroup("global", "グローバルチャット");
-      });
-
-      // UIの黒い部分をクリックすると閉じる
-
-      authContainer.addEventListener("click", (event) => {
-        if (event.target === authContainer) {
-          authContainer.style.display = "none";
-        }
-      });
-
-      initialize();
+        messageInput.value = "";
+      }
     });
+
+  // メッセージ履歴を削除する
+  function clearChat() {
+    if (confirm("本当にチャット履歴を削除しますか？")) {
+      database.ref(`messages/${currentGroupId}`).remove()
+        .then(() => {
+          chatContainer.innerHTML = "";
+        })
+        .catch((error) => {
+          console.error("チャット履歴を削除できませんでした: ", error);
+        });
+    }
+  }
+
+  // 名前を保存する
+  saveNameButton.addEventListener("click", () => {
+    const name = nameInput.value;
+    if (name) {
+      currentUserName = name;
+      saveNameToCookies(name);
+      nameContainer.style.display = "none";
+    }
+  });
+
+  // グループを作成する
+  groupForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const groupName = groupNameInput.value;
+    const groupPassword = groupPasswordInput.value;
+    if (groupName && groupPassword) {
+      const groupId = Date.now().toString();
+      const groupData = {
+        name: groupName,
+        password: groupPassword
+      };
+      database.ref(`groups/${groupId}`).set(groupData, (error) => {
+        if (error) {
+          alert("グループを作成できませんでした。");
+        } else {
+          alert(`グループを作成しました。グループID: ${groupId}`);
+          joinGroup(groupId, groupName);
+        }
+      });
+    }
+  });
+
+  // グループに参加する
+  joinGroupButton.addEventListener("click", () => {
+    authContainer.style.display = "flex";
+  });
+
+  // グループ認証
+  authForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const groupId = authGroupIdInput.value;
+    const groupPassword = authGroupPasswordInput.value;
+    if (groupId && groupPassword) {
+      database.ref(`groups/${groupId}`).get().then((snapshot) => {
+        if (snapshot.exists() && snapshot.val().password === groupPassword) {
+          joinGroup(groupId, snapshot.val().name);
+          authContainer.style.display = "none";
+        } else {
+          alert("グループIDまたはパスワードが間違っています。");
+        }
+      }).catch((error) => {
+        alert("グループを取得できませんでした。");
+      });
+    }
+  });
+
+  // グローバルチャットに切り替える
+  globalChatButton.addEventListener("click", () => {
+    switchGroup("global", "グローバルチャット");
+  });
+
+  // UIの黒い部分をクリックすると閉じる
+  authContainer.addEventListener("click", (event) => {
+    if (event.target === authContainer) {
+      authContainer.style.display = "none";
+    }
+  });
+
+  initialize();
+});
   </script>
 </body>
 </html>
