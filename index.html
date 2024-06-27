@@ -228,11 +228,60 @@
       // ユーザー名を保存するための変数
       let username = "";
 
+      // クッキーを設定する関数
+      function setCookie(name, value, days) {
+        const d = new Date();
+        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + d.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+      }
+
+      // クッキーを取得する関数
+      function getCookie(name) {
+        const cname = name + "=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const ca = decodedCookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(cname) == 0) {
+            return c.substring(cname.length, c.length);
+          }
+        }
+        return "";
+      }
+
+      // ページがロードされたときにクッキーから名前を取得
+      username = getCookie("username");
+      if (username) {
+        nameContainer.style.display = "none";
+      } else {
+        nameContainer.style.display = "flex";
+      }
+
+      // ページがロードされたときにクッキーから参加済みグループを取得
+      const savedGroups = getCookie("joinedGroups");
+      if (savedGroups) {
+        joinedGroups = savedGroups.split(",");
+        joinedGroups.forEach(groupId => {
+          // グループ情報をFirebaseから取得してボタンを追加
+          database.ref(`groups/${groupId}`).once("value", (snapshot) => {
+            const groupData = snapshot.val();
+            if (groupData) {
+              addGroupButton(groupId, groupData.name);
+            }
+          });
+        });
+      }
+
       // ユーザーが名前を入力して保存ボタンをクリックしたときの処理
       saveNameButton.addEventListener("click", () => {
         username = nameInput.value.trim();
         if (username) {
           nameContainer.style.display = "none";
+          setCookie("username", username, 30);
         }
       });
 
@@ -332,6 +381,7 @@
             authContainer.style.display = "none";
             loadGroupMessages(groupId);
             joinedGroups.push(groupId); // 参加したグループをリストに追加
+            setCookie("joinedGroups", joinedGroups.join(","), 30); // クッキーに保存
           }
         });
       }
@@ -348,33 +398,27 @@
       function authenticateGroup(groupId, groupPassword) {
         database.ref(`groups/${groupId}`).once("value", (snapshot) => {
           const groupData = snapshot.val();
-          if (groupData && groupData.password === groupPassword) {
-            joinGroup(groupId);
-            addGroupButton(groupId, groupData.name); // 認証後にボタンを追加
+          if (groupData) {
+            if (groupData.password === groupPassword) {
+              joinGroup(groupId);
+            } else {
+              alert("グループパスワードが間違っています");
+            }
           } else {
-            alert("グループIDまたはパスワードが間違っています");
+            alert("グループが見つかりません");
           }
         });
       }
 
-      // 参加済みグループのボタンを追加する関数
+      // グループボタンを追加する関数
       function addGroupButton(groupId, groupName) {
-        if (joinedGroups.includes(groupId)) return; // 既に参加しているグループの場合はボタンを追加しない
-        const button = document.createElement("button");
-        button.textContent = groupName;
-        button.classList.add("group-button");
-        button.addEventListener("click", () => {
+        const groupButton = document.createElement("button");
+        groupButton.textContent = groupName;
+        groupButton.addEventListener("click", () => {
           joinGroup(groupId);
         });
-        groupHistory.appendChild(button);
+        groupHistory.appendChild(groupButton);
       }
-
-      // 認証画面外をクリックしたときに閉じる処理
-      window.addEventListener("click", (event) => {
-        if (event.target === authContainer) {
-          authContainer.style.display = "none";
-        }
-      });
     });
   </script>
 </body>
